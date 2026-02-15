@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install system deps
+      - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
@@ -37,8 +37,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython
 
-      # ✅ Android SDK – بدون mv، بدون تداخل
-      - name: Install Android SDK (safe layout)
+      # ✅ Android SDK – ساختار کاملاً رسمی
+      - name: Install Android SDK
         run: |
           set -e
 
@@ -46,14 +46,19 @@ jobs:
           TOOLS_ZIP="commandlinetools-linux-11076708_latest.zip"
 
           mkdir -p "$SDK_ROOT/cmdline-tools/latest"
-          cd "$SDK_ROOT"
+          mkdir -p "$SDK_ROOT/tmp"
+          cd "$SDK_ROOT/tmp"
 
           wget -q https://dl.google.com/android/repository/$TOOLS_ZIP
-          unzip -q $TOOLS_ZIP -d "$SDK_ROOT/cmdline-tools/latest"
+          unzip -q $TOOLS_ZIP
+
+          # ✅ انتقال فقط محتوای واقعی tools
+          mv cmdline-tools/* "$SDK_ROOT/cmdline-tools/latest/"
+          rm -rf "$SDK_ROOT/tmp"
 
           export ANDROID_SDK_ROOT="$SDK_ROOT"
           export ANDROID_HOME="$SDK_ROOT"
-          export PATH="$SDK_ROOT/cmdline-tools/latest/cmdline-tools/bin:$PATH"
+          export PATH="$SDK_ROOT/cmdline-tools/latest/bin:$PATH"
 
           yes | sdkmanager --licenses
 
@@ -62,18 +67,18 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      # ✅ فقط NDK سازگار با buildozer
+      # ✅ NDK سازگار با python-for-android
       - name: Install Android NDK r25b
         run: |
           export ANDROID_SDK_ROOT="$HOME/android-sdk"
-          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools/bin:$PATH"
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
 
           sdkmanager "ndk;25.1.8937393"
 
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
 
-      # ✅ Build نهایی APK
+      # ✅ Build نهایی
       - name: Build APK
         run: |
           export ANDROID_SDK_ROOT="$HOME/android-sdk"
