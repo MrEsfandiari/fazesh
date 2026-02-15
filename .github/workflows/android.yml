@@ -35,7 +35,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython
 
-      # ---------- ANDROID SDK ----------
       - name: Install Android SDK
         run: |
           set -e
@@ -61,7 +60,6 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      # ---------- NDK 25b ----------
       - name: Install NDK r25b
         run: |
           SDK=/home/runner/android-sdk
@@ -69,7 +67,6 @@ jobs:
 
           sdkmanager "ndk;25.1.8937393"
 
-      # ---------- 🔴 FIX HARD-CODED SDKMANAGER ----------
       - name: FORCE sdkmanager legacy path (MANDATORY)
         run: |
           SDK=/home/runner/android-sdk
@@ -84,7 +81,6 @@ jobs:
 
           echo "VERIFY:"          ls -l $SDK/tools/bin/sdkmanager
 
-      # ---------- BUILD ----------
       - name: Build APK
         run: |
           export ANDROID_SDK_ROOT=/home/runner/android-sdk
