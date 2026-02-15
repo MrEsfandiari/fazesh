@@ -37,7 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install buildozer cython
 
-      # ✅ Android SDK – ساختار کاملاً رسمی
+      # ---------- Android SDK ----------
       - name: Install Android SDK
         run: |
           set -e
@@ -52,7 +52,6 @@ jobs:
           wget -q https://dl.google.com/android/repository/$TOOLS_ZIP
           unzip -q $TOOLS_ZIP
 
-          # ✅ انتقال فقط محتوای واقعی tools
           mv cmdline-tools/* "$SDK_ROOT/cmdline-tools/latest/"
           rm -rf "$SDK_ROOT/tmp"
 
@@ -67,7 +66,7 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      # ✅ NDK سازگار با python-for-android
+      # ---------- NDK r25b ----------
       - name: Install Android NDK r25b
         run: |
           export ANDROID_SDK_ROOT="$HOME/android-sdk"
@@ -78,7 +77,13 @@ jobs:
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/25.1.8937393" >> $GITHUB_ENV
 
-      # ✅ Build نهایی
+      # ✅ حیاتی: لینک SDK برای Buildozer (رفع قطعی aidl)
+      - name: Link Android SDK for Buildozer
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform
+          ln -sfn $HOME/android-sdk $HOME/.buildozer/android/platform/android-sdk
+
+      # ---------- Build APK ----------
       - name: Build APK
         run: |
           export ANDROID_SDK_ROOT="$HOME/android-sdk"
